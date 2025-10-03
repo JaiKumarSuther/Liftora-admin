@@ -5,6 +5,7 @@ import Image from 'next/image';
 import LoginForm from '../components/LoginForm';
 import ForgotPassword from '../components/ForgotPassword';
 import SignUp from '../components/SignUp';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 type ViewType = 'login' | 'forgot-password' | 'signup';
 
@@ -35,23 +36,25 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-6 sm:mb-8">
-          <Image
-            src="/assets/logo.png"
-            alt="Liftora Logo"
-            width={160}
-            height={48}
-            className="w-24 mx-auto"
-            priority
-          />
-        </div>
+    <ProtectedRoute requireAuth={false}>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          {/* Logo */}
+          <div className="text-center mb-6 sm:mb-8">
+            <Image
+              src="/assets/logo.png"
+              alt="Liftora Logo"
+              width={200}
+              height={60}
+              className="w-32 mx-auto"
+              priority
+            />
+          </div>
 
-        {/* Form */}
-        {renderCurrentView()}
+          {/* Form */}
+          {renderCurrentView()}
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

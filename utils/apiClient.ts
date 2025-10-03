@@ -2,11 +2,15 @@ import axios from 'axios';
 import { store } from '@/store';
 import { toast } from 'sonner';
 
-// Create multiple API clients for different ports
-const createApiClient = (port: string) => {
+// Create API client
+const createApiClient = () => {
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://liftora-production-0730.up.railway.app';
+  const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v2';
+  const timeout = parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '10000');
+  
   const client = axios.create({
-    baseURL: `http://localhost:${port}/api/v2`,
-    timeout: 10000,
+    baseURL: `${baseURL}/api/${apiVersion}`,
+    timeout,
   });
 
   client.interceptors.request.use((config) => {
@@ -39,14 +43,5 @@ const createApiClient = (port: string) => {
   return client;
 };
 
-// API clients for different services
-export const api8001 = createApiClient('8001'); // User management
-export const api8002 = createApiClient('8002'); // Auth and analytics
-export const api8003 = createApiClient('8003'); // Routines, quotes, rewards
-export const api8004 = createApiClient('8004'); // Stats
-
-// Default export for backward compatibility
-export default api8001;
-
-
-
+// Default export for the main API client
+export default createApiClient();

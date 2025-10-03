@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { FiMail, FiArrowLeft } from 'react-icons/fi';
 import { validateEmail } from '@/utils';
 import { ERROR_MESSAGES } from '@/constants';
+import { toast } from 'sonner';
 import Button from './UI/Button';
 import Input from './UI/Input';
 
@@ -15,24 +16,22 @@ export default function ForgotPassword({ onBackToLogin }: ForgotPasswordProps) {
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate email
     if (!email) {
-      setError('Email is required');
+      toast.error('Email is required');
       return;
     }
     
     if (!validateEmail(email)) {
-      setError('Please enter a valid email address');
+      toast.error('Please enter a valid email address');
       return;
     }
 
     setIsLoading(true);
-    setError(null);
     
     try {
       // Handle password reset logic here
@@ -41,9 +40,10 @@ export default function ForgotPassword({ onBackToLogin }: ForgotPasswordProps) {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      toast.success('Password reset link sent to your email');
       setIsSubmitted(true);
     } catch {
-      setError(ERROR_MESSAGES.GENERIC);
+      toast.error(ERROR_MESSAGES.GENERIC);
     } finally {
       setIsLoading(false);
     }
@@ -95,12 +95,6 @@ export default function ForgotPassword({ onBackToLogin }: ForgotPasswordProps) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {error && (
-          <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3" role="alert">
-            {error}
-          </div>
-        )}
-
         <Input
           type="email"
           label="Email Address"
@@ -108,7 +102,6 @@ export default function ForgotPassword({ onBackToLogin }: ForgotPasswordProps) {
           onChange={setEmail}
           placeholder="Enter your email address"
           required
-          error={error || undefined}
           icon={<FiMail />}
           iconPosition="left"
         />

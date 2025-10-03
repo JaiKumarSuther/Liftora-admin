@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { FiArrowLeft, FiEye, FiEyeOff, FiCheck, FiUser, FiMail, FiLock } from 'react-icons/fi';
 import { API_ENDPOINTS } from '@/constants';
 import { useMutation } from '@tanstack/react-query';
-import api from '@/utils/apiClient';
+import apiClient from '@/utils/apiClient';
 import { handleApiError, validateEmail } from '@/utils';
 import { toast } from 'sonner';
 import Button from './UI/Button';
@@ -17,8 +17,7 @@ interface SignUpProps {
 
 export default function SignUp({ onBackToLogin }: SignUpProps) {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -27,28 +26,25 @@ export default function SignUp({ onBackToLogin }: SignUpProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
 
   const signupMutation = useMutation({
     mutationFn: async () => {
-      const form = new FormData();
-      form.append('fullName', `${formData.firstName} ${formData.lastName}`.trim());
-      form.append('email', formData.email);
-      form.append('password', formData.password);
-      form.append('signUpMethod', 'mail');
-      const { data } = await api.post(API_ENDPOINTS.AUTH.SIGNUP, form);
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      };
+      const { data } = await apiClient.post(API_ENDPOINTS.AUTH.SIGNUP, payload);
       return data;
     },
     onSuccess: () => {
       toast.success('Account created successfully');
       setIsSubmitted(true);
-      setError(null);
     },
     onError: (e) => {
-      setError(handleApiError(e));
       toast.error(handleApiError(e));
     }
   });
@@ -56,12 +52,8 @@ export default function SignUp({ onBackToLogin }: SignUpProps) {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
-    }
-
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
     }
 
     if (!formData.email) {
@@ -74,6 +66,14 @@ export default function SignUp({ onBackToLogin }: SignUpProps) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters long';
+    } else if (!/[A-Z]/.test(formData.password)) {
+      newErrors.password = 'Password must include at least one uppercase letter';
+    } else if (!/[a-z]/.test(formData.password)) {
+      newErrors.password = 'Password must include at least one lowercase letter';
+    } else if (!/[0-9]/.test(formData.password)) {
+      newErrors.password = 'Password must include at least one number';
+    } else if (!/[^A-Za-z0-9]/.test(formData.password)) {
+      newErrors.password = 'Password must include at least one special character';
     }
 
     if (!formData.confirmPassword) {
@@ -87,6 +87,13 @@ export default function SignUp({ onBackToLogin }: SignUpProps) {
     }
 
     setErrors(newErrors);
+    
+    // Show toast for first validation error
+    const firstError = Object.values(newErrors)[0];
+    if (firstError) {
+      toast.error(firstError);
+    }
+    
     return Object.keys(newErrors).length === 0;
   };
 
@@ -109,7 +116,6 @@ export default function SignUp({ onBackToLogin }: SignUpProps) {
       return;
     }
 
-    setError(null);
     signupMutation.mutate();
   };
 
@@ -157,37 +163,19 @@ export default function SignUp({ onBackToLogin }: SignUpProps) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3" role="alert">
-            {error}
-          </div>
-        )}
 
-        {/* Name Fields */}
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            type="text"
-            label="First Name"
-            value={formData.firstName}
-            onChange={(value) => handleInputChange('firstName', value)}
-            placeholder="First name"
-            required
-            error={errors.firstName}
-            icon={<FiUser />}
-            iconPosition="left"
-          />
-          <Input
-            type="text"
-            label="Last Name"
-            value={formData.lastName}
-            onChange={(value) => handleInputChange('lastName', value)}
-            placeholder="Last name"
-            required
-            error={errors.lastName}
-            icon={<FiUser />}
-            iconPosition="left"
-          />
-        </div>
+        {/* Name Field */}
+        <Input
+          type="text"
+          label="Full Name"
+          value={formData.name}
+          onChange={(value) => handleInputChange('name', value)}
+          placeholder="Enter your full name"
+          required
+          error={errors.name}
+          icon={<FiUser />}
+          iconPosition="left"
+        />
 
         {/* Email Input */}
         <Input
@@ -286,9 +274,6 @@ export default function SignUp({ onBackToLogin }: SignUpProps) {
             </button>
           </label>
         </div>
-        {errors.agreeToTerms && (
-          <p className="text-sm text-red-400">{errors.agreeToTerms}</p>
-        )}
 
         {/* Sign Up Button */}
         <Button

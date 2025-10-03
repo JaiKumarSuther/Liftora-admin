@@ -5,6 +5,7 @@ import { User, AuthContextType } from '@/types';
 import { STORAGE_KEYS } from '@/constants';
 import { useDispatch } from 'react-redux';
 import { setToken, clearToken } from '@/store/slices/authSlice';
+import { getTokenFromCookies, setTokenInCookies, clearTokenFromCookies, isAuthenticated, getUserFromToken } from '@/utils/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -26,26 +27,58 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // Check for existing authentication
     const savedUser = localStorage.getItem('user');
     const savedToken = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    const cookieToken = getTokenFromCookies();
+    
+    // If we have a valid token in cookies, use it
+    if (cookieToken && isAuthenticated()) {
+      const tokenUser = getUserFromToken();
+      if (tokenUser) {
+        const uiUser: User = {
+          id: tokenUser.id.toString(),
+          name: tokenUser.email.split('@')[0],
+          email: tokenUser.email,
+          role: tokenUser.role,
+          initials: tokenUser.email.charAt(0).toUpperCase(),
+          avatarUrl: undefined,
+        };
+        setUser(uiUser);
+        dispatch(setToken(cookieToken));
+        setIsLoading(false);
+        return;
+      }
+    }
+    
+    // Fallback to localStorage
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
       } catch {
         // ignore parse error
       }
     }
-    if (savedToken) dispatch(setToken(savedToken));
+    if (savedToken) {
+      dispatch(setToken(savedToken));
+    }
+    
     setIsLoading(false);
   }, [dispatch]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
+      console.log('Attempting login for:', email);
       const { authService } = await import('@/utils/apiServices');
       const response = await authService.login(email, password);
       
-      if (response.success && response.data?.token) {
-        const { token, admin } = response.data;
+      console.log('Login response:', response);
+      
+      if (response.success && response.token) {
+        const { token, admin } = response;
+        
+        console.log('Login successful, setting up user session...');
         
         // Create user object from admin data
         const uiUser: User = {
@@ -63,15 +96,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         dispatch(setToken(token));
         
         // Set auth cookie for middleware
-        try {
-          document.cookie = `auth_token=${token}; path=/; SameSite=Lax`;
-        } catch {}
+        setTokenInCookies(token);
         
+        console.log('User session established successfully');
         return true;
       } else {
+        console.error('Login failed - invalid response:', response);
         throw new Error(response.message || 'Login failed');
       }
-        } catch (error: unknown) {
+    } catch (error: unknown) {
+      console.error('Login error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
       throw new Error(errorMessage);
     }
@@ -83,9 +117,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
     dispatch(clearToken());
     // Clear auth cookie for middleware
-    try {
-      document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
-    } catch {}
+    clearTokenFromCookies();
   };
 
   const updateUser = (partial: Partial<User>) => {
@@ -112,4 +144,5 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
 

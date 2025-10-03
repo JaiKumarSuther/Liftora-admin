@@ -29,8 +29,8 @@ const UserManagement: React.FC = () => {
     name: '',
     email: '',
     subscriptionStatus: '',
-    alertsToggle: false,
-    isVerified: false
+    alertsToggle: 0,
+    isVerified: 0
   });
 
   // Fetch users with filters
@@ -50,6 +50,7 @@ const UserManagement: React.FC = () => {
     { value: 'active', label: 'Active', type: 'status' as const },
     { value: 'inactive', label: 'Inactive', type: 'status' as const },
     { value: 'cancelled', label: 'Cancelled', type: 'status' as const },
+    { value: 'null', label: 'No Subscription', type: 'status' as const },
   ];
 
   const dateOptions = [
@@ -70,7 +71,7 @@ const UserManagement: React.FC = () => {
     setEditForm({
       name: user.name,
       email: user.email,
-      subscriptionStatus: user.subscriptionStatus,
+      subscriptionStatus: user.subscriptionStatus || '',
       alertsToggle: user.alertsToggle,
       isVerified: user.isVerified
     });
@@ -110,7 +111,7 @@ const UserManagement: React.FC = () => {
   };
 
   // Get status badge color
-  const getStatusBadgeColor = (status: string) => {
+  const getStatusBadgeColor = (status: string | null) => {
     switch (status) {
       case 'active':
         return 'bg-green-100 text-green-800';
@@ -118,6 +119,8 @@ const UserManagement: React.FC = () => {
         return 'bg-gray-100 text-gray-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
+      case null:
+        return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -148,10 +151,10 @@ const UserManagement: React.FC = () => {
   const pagination = usersData?.pagination;
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="flex min-h-screen bg-gray-900">
       <Sidebar activeNav={activeNav} onNavChange={setActiveNav} />
       
-      <div className="ml-64">
+      <div className="flex-1">
         <Header title="User Management" />
         
         <main className="p-8">
@@ -212,6 +215,9 @@ const UserManagement: React.FC = () => {
                       Verified
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                      Alerts
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -227,7 +233,22 @@ const UserManagement: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-full bg-gray-600 flex items-center justify-center">
+                            {user.profilePic ? (
+                              <img
+                                className="h-10 w-10 rounded-full object-cover"
+                                src={user.profilePic}
+                                alt={user.name}
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  const fallback = target.nextElementSibling as HTMLElement;
+                                  if (fallback) fallback.style.display = 'flex';
+                                }}
+                              />
+                            ) : null}
+                            <div 
+                              className={`h-10 w-10 rounded-full bg-gray-600 flex items-center justify-center ${user.profilePic ? 'hidden' : 'flex'}`}
+                            >
                               <span className="text-sm font-medium text-white">
                                 {user.name.charAt(0).toUpperCase()}
                               </span>
@@ -244,7 +265,7 @@ const UserManagement: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(user.subscriptionStatus)}`}>
-                          {user.subscriptionStatus}
+                          {user.subscriptionStatus || 'No Subscription'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
@@ -252,9 +273,16 @@ const UserManagement: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          user.isVerified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          user.isVerified === 1 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                         }`}>
-                          {user.isVerified ? 'Verified' : 'Unverified'}
+                          {user.isVerified === 1 ? 'Verified' : 'Unverified'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          user.alertsToggle === 1 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {user.alertsToggle === 1 ? 'Enabled' : 'Disabled'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -324,6 +352,35 @@ const UserManagement: React.FC = () => {
       >
         {selectedUser && (
           <div className="space-y-4">
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="flex-shrink-0 h-16 w-16">
+                {selectedUser.profilePic ? (
+                  <img
+                    className="h-16 w-16 rounded-full object-cover"
+                    src={selectedUser.profilePic}
+                    alt={selectedUser.name}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div 
+                  className={`h-16 w-16 rounded-full bg-gray-600 flex items-center justify-center ${selectedUser.profilePic ? 'hidden' : 'flex'}`}
+                >
+                  <span className="text-xl font-medium text-white">
+                    {selectedUser.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white">{selectedUser.name}</h3>
+                <p className="text-gray-400">ID: {selectedUser.id}</p>
+              </div>
+            </div>
+            
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
@@ -334,9 +391,9 @@ const UserManagement: React.FC = () => {
                 <p className="text-white">{selectedUser.email}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Subscription Status</label>
                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(selectedUser.subscriptionStatus)}`}>
-                  {selectedUser.subscriptionStatus}
+                  {selectedUser.subscriptionStatus || 'No Subscription'}
                 </span>
               </div>
               <div>
@@ -346,17 +403,17 @@ const UserManagement: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Verified</label>
                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                  selectedUser.isVerified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                  selectedUser.isVerified === 1 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                 }`}>
-                  {selectedUser.isVerified ? 'Verified' : 'Unverified'}
+                  {selectedUser.isVerified === 1 ? 'Verified' : 'Unverified'}
                 </span>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Alerts</label>
                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                  selectedUser.alertsToggle ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                  selectedUser.alertsToggle === 1 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                 }`}>
-                  {selectedUser.alertsToggle ? 'Enabled' : 'Disabled'}
+                  {selectedUser.alertsToggle === 1 ? 'Enabled' : 'Disabled'}
                 </span>
               </div>
             </div>
@@ -396,6 +453,7 @@ const UserManagement: React.FC = () => {
               onChange={(e) => setEditForm(prev => ({ ...prev, subscriptionStatus: e.target.value }))}
               className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
+              <option value="">No Subscription</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
               <option value="cancelled">Cancelled</option>
@@ -405,8 +463,8 @@ const UserManagement: React.FC = () => {
             <label className="flex items-center">
               <input
                 type="checkbox"
-                checked={editForm.isVerified}
-                onChange={(e) => setEditForm(prev => ({ ...prev, isVerified: e.target.checked }))}
+                checked={editForm.isVerified === 1}
+                onChange={(e) => setEditForm(prev => ({ ...prev, isVerified: e.target.checked ? 1 : 0 }))}
                 className="mr-2"
               />
               <span className="text-sm text-gray-300">Verified</span>
@@ -414,8 +472,8 @@ const UserManagement: React.FC = () => {
             <label className="flex items-center">
               <input
                 type="checkbox"
-                checked={editForm.alertsToggle}
-                onChange={(e) => setEditForm(prev => ({ ...prev, alertsToggle: e.target.checked }))}
+                checked={editForm.alertsToggle === 1}
+                onChange={(e) => setEditForm(prev => ({ ...prev, alertsToggle: e.target.checked ? 1 : 0 }))}
                 className="mr-2"
               />
               <span className="text-sm text-gray-300">Alerts Enabled</span>

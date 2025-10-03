@@ -23,7 +23,7 @@ const EventManagement: React.FC = () => {
     queryKey: ['host-events'],
     queryFn: async () => {
       console.log('Fetching events from API...');
-      const { data } = await api.get('/api/v2/host-event', { params: { page: 1, limit: 50 } });
+      const { data } = await api.get('/host-event', { params: { page: 1, limit: 50 } });
       console.log('Events fetched:', data?.events?.length || 0, 'events');
       return data?.events || [];
     }
@@ -58,7 +58,7 @@ const EventManagement: React.FC = () => {
 
   const deleteEvent = useMutation({
     mutationFn: async (id: string) => {
-      const res = await api.delete(`/api/v2/host-event/${encodeURIComponent(id)}`);
+      const res = await api.delete(`/host-event/${encodeURIComponent(id)}`);
       return res.data;
     },
     onSuccess: () => {
@@ -70,7 +70,7 @@ const EventManagement: React.FC = () => {
 
   const bulkDeleteEvents = useMutation({
     mutationFn: async (eventIds: string[]) => {
-      const res = await api.post('/api/v2/host-event/bulk-delete', { eventIds });
+      const res = await api.post('/host-event/bulk-delete', { eventIds });
       return res.data;
     },
     onSuccess: (data) => {
@@ -107,7 +107,7 @@ const EventManagement: React.FC = () => {
     console.log('handleApprove called with id:', id);
     try {
       console.log('Making API call to approve event:', id);
-      const response = await api.put(`/api/v2/host-event/${encodeURIComponent(id)}/approve`);
+      const response = await api.put(`/host-event/${encodeURIComponent(id)}/approve`);
       console.log('API call successful:', response.data);
       toast.success('Event approved successfully');
       console.log('Invalidating queries to refetch events...');
@@ -130,7 +130,7 @@ const EventManagement: React.FC = () => {
       console.log('Making API call to flag event:', id);
       
       // First, create the flag report
-      const flagResponse = await api.post('/api/v2/moderation/flags', {
+      const flagResponse = await api.post('/moderation/flags', {
         reporterId: parseInt(user.id), // Use authenticated user's ID
         contentType: 'event',
         contentId: parseInt(id),
@@ -140,7 +140,7 @@ const EventManagement: React.FC = () => {
       console.log('Flag report created:', flagResponse.data);
       
       // Then, update the event status to "flagged"
-      const eventResponse = await api.put(`/api/v2/host-event/${encodeURIComponent(id)}/flag`);
+      const eventResponse = await api.put(`/host-event/${encodeURIComponent(id)}/flag`);
       console.log('Event status updated to flagged:', eventResponse.data);
       
       toast.success('Event flagged successfully');
@@ -160,7 +160,7 @@ const EventManagement: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-900 flex">
       <Sidebar activeNav={activeNav} onNavChange={handleNavChange} />
-      <div className="flex-1 lg:ml-0">
+      <div className="flex-1">
         <Header title="Event Management" />
         <main className="p-3 sm:p-4 md:p-6 lg:p-8">
           {/* Page Title - Mobile */}

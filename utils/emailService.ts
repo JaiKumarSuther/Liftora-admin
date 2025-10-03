@@ -23,7 +23,7 @@ export class EmailService {
       });
 
       // Call backend email service using the configured API client
-      const response = await api.post('/api/v2/admin/send-email', notification);
+      const response = await api.post('/admin/send-email', notification);
       
       return response.data.status === true;
     } catch (error) {

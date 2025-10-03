@@ -90,15 +90,15 @@ const Sidebar: React.FC<SidebarProps> = ({ activeNav, onNavChange }) => {
   };
 
   const SidebarContent = () => (
-    <div className='bg-gray-900 min-h-screen'>
+    <div className='bg-gray-900 min-h-[120vh]'>
       {/* Logo */}
       <div className="mb-8 p-6 border-b border-gray-700">
         <Image
           src="/assets/logo.png"
           alt="Liftora Logo"
-          width={140}
-          height={40}
-          className="mx-auto w-24"
+          width={180}
+          height={52}
+          className="mx-auto w-32"
           priority
         />
       </div>
@@ -197,7 +197,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeNav, onNavChange }) => {
       </div>
 
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:flex-col w-64 relative lg:sticky lg:top-0 lg:h-screen border-r border-gray-700 overflow-y-auto bg-gray-900">
+      <div className="hidden lg:flex lg:flex-col w-64 relative lg:sticky lg:top-0 lg:h-[120vh] border-r border-gray-700 overflow-y-auto bg-gray-900">
         <SidebarContent />
       </div>
     </div>

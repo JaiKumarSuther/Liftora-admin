@@ -34,8 +34,7 @@ export interface LoginFormData {
 }
 
 export interface SignUpFormData {
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -132,11 +131,11 @@ export interface AdminUser {
   id: number;
   name: string;
   email: string;
-  subscriptionStatus: string;
+  subscriptionStatus: string | null;
   createdAt: string;
-  isVerified: boolean;
-  alertsToggle: boolean;
-  profilePic?: string;
+  isVerified: number; // 0 or 1 from API
+  alertsToggle: number; // 0 or 1 from API
+  profilePic: string | null;
 }
 
 export interface AdminSubscription {
@@ -214,7 +213,7 @@ export interface RewardEvent {
 export interface UserRoutine {
   id: number;
   user_id: number;
-  name: string;
+  name?: string;
   description?: string;
   tasks: any[];
   createdAt: string;

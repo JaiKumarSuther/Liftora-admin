@@ -1,4 +1,4 @@
-import { api8001, api8002, api8003, api8004 } from './apiClient';
+import apiClient from './apiClient';
 import { toast } from 'sonner';
 
 // Types for API responses
@@ -24,16 +24,28 @@ export interface PaginationResponse<T> {
 export const authService = {
   login: async (email: string, password: string) => {
     try {
-      const response = await api8002.post('/admin/login', { email, password });
+      console.log('Making login request to:', '/admin/login');
+      console.log('Request payload:', { email, password: '***' });
+      
+      const response = await apiClient.post('/admin/login', { email, password });
+      
+      console.log('API Response status:', response.status);
+      console.log('API Response data:', response.data);
+      
       if (response.data.success) {
         toast.success('Login successful!');
         return response.data;
       } else {
+        console.error('Login failed - API returned success: false');
         toast.error(response.data.message || 'Login failed');
         throw new Error(response.data.message || 'Login failed');
       }
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Login failed';
+      console.error('API Error:', error);
+      console.error('Error response:', error.response);
+      console.error('Error message:', error.message);
+      
+      const message = error.response?.data?.message || error.message || 'Login failed';
       toast.error(message);
       throw error;
     }
@@ -49,7 +61,7 @@ export const statsService = {
     planType?: string;
   }) => {
     try {
-      const response = await api8004.get('/admin/stats', { params });
+      const response = await apiClient.get('/admin/stats', { params });
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to fetch stats';
@@ -64,7 +76,7 @@ export const statsService = {
     interval?: 'day' | 'week' | 'month';
   }) => {
     try {
-      const response = await api8002.get('/admin/analytics/advanced', { params });
+      const response = await apiClient.get('/admin/analytics/advanced', { params });
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to fetch analytics';
@@ -78,7 +90,7 @@ export const statsService = {
     endDate?: string;
   }) => {
     try {
-      const response = await api8003.get('/admin/analytics/user-retention', { params });
+      const response = await apiClient.get('/admin/analytics/user-retention', { params });
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to fetch retention report';
@@ -99,7 +111,7 @@ export const userService = {
     limit?: number;
   }) => {
     try {
-      const response = await api8001.get('/admin/users', { params });
+      const response = await apiClient.get('/admin/users', { params });
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to fetch users';
@@ -110,7 +122,7 @@ export const userService = {
 
   getUserById: async (userId: number) => {
     try {
-      const response = await api8001.get(`/admin/users/${userId}`);
+      const response = await apiClient.get(`/admin/users/${userId}`);
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to fetch user';
@@ -127,7 +139,7 @@ export const userService = {
     isVerified?: boolean;
   }) => {
     try {
-      const response = await api8001.put(`/admin/users/${userId}`, data);
+      const response = await apiClient.put(`/admin/users/${userId}`, data);
       if (response.data.success) {
         toast.success('User updated successfully!');
       }
@@ -141,7 +153,7 @@ export const userService = {
 
   getUserAIConversations: async (userId: number) => {
     try {
-      const response = await api8003.get(`/admin/users/${userId}/ai-conversations`);
+      const response = await apiClient.get(`/admin/users/${userId}/ai-conversations`);
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to fetch AI conversations';
@@ -152,7 +164,7 @@ export const userService = {
 
   getUserRoutines: async (userId: number) => {
     try {
-      const response = await api8003.get(`/admin/users/${userId}/routines`);
+      const response = await apiClient.get(`/admin/users/${userId}/routines`);
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to fetch user routines';
@@ -163,7 +175,7 @@ export const userService = {
 
   getUserStreaks: async (userId: number) => {
     try {
-      const response = await api8003.get(`/admin/users/${userId}/streaks`);
+      const response = await apiClient.get(`/users/${userId}/streaks`);
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to fetch user streaks';
@@ -177,7 +189,7 @@ export const userService = {
 export const routineService = {
   getAllRoutines: async () => {
     try {
-      const response = await api8003.get('/admin/routines');
+      const response = await apiClient.get('/admin/routines');
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to fetch routines';
@@ -188,7 +200,7 @@ export const routineService = {
 
   getAllUserStreaks: async () => {
     try {
-      const response = await api8003.get('/admin/users/62/streaks'); // This seems to be a specific endpoint
+      const response = await apiClient.get('/users/streaks/all'); // Get all user streaks
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to fetch all user streaks';
@@ -205,7 +217,7 @@ export const quotesService = {
     limit?: number;
   }) => {
     try {
-      const response = await api8003.get('/admin/quotes/motivational', { params });
+      const response = await apiClient.get('/admin/quotes/motivational', { params });
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to fetch quotes';
@@ -222,7 +234,7 @@ export const quotesService = {
     theme?: string;
   }) => {
     try {
-      const response = await api8003.post('/admin/quotes/motivational', data);
+      const response = await apiClient.post('/admin/quotes/motivational', data);
       if (response.data.success) {
         toast.success('Quote created successfully!');
       }
@@ -242,7 +254,7 @@ export const quotesService = {
     theme?: string;
   }) => {
     try {
-      const response = await api8003.put(`/admin/quotes/motivational/${quoteId}`, data);
+      const response = await apiClient.put(`/admin/quotes/motivational/${quoteId}`, data);
       if (response.data.success) {
         toast.success('Quote updated successfully!');
       }
@@ -256,7 +268,7 @@ export const quotesService = {
 
   deleteMotivationalQuote: async (quoteId: number) => {
     try {
-      const response = await api8003.delete(`/admin/quotes/motivational/${quoteId}`);
+      const response = await apiClient.delete(`/admin/quotes/motivational/${quoteId}`);
       if (response.data.success) {
         toast.success('Quote deleted successfully!');
       }
@@ -273,7 +285,7 @@ export const quotesService = {
 export const rewardsService = {
   getAllRewardEvents: async () => {
     try {
-      const response = await api8003.get('/admin/rewards/events');
+      const response = await apiClient.get('/admin/rewards/events');
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to fetch reward events';
@@ -294,7 +306,7 @@ export const rewardsService = {
     metadata?: any;
   }) => {
     try {
-      const response = await api8003.put(`/admin/rewards/event/${eventId}`, data);
+      const response = await apiClient.put(`/admin/rewards/event/${eventId}`, data);
       if (response.data.success) {
         toast.success('Reward event updated successfully!');
       }
@@ -318,7 +330,7 @@ export const rewardsService = {
     metadata?: any;
   }) => {
     try {
-      const response = await api8003.post('/admin/rewards/events', data);
+      const response = await apiClient.post('/admin/rewards/events', data);
       if (response.data.success) {
         toast.success('Reward event created successfully!');
       }
@@ -332,7 +344,7 @@ export const rewardsService = {
 
   deleteRewardEvent: async (eventId: number) => {
     try {
-      const response = await api8003.delete(`/admin/rewards/event/${eventId}`);
+      const response = await apiClient.delete(`/admin/rewards/event/${eventId}`);
       if (response.data.success) {
         toast.success('Reward event deleted successfully!');
       }

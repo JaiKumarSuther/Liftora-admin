@@ -46,6 +46,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPassword, onSignUp }) => 
     }
 
     setErrors(newErrors);
+    
+    // Show toast for first validation error
+    const firstError = Object.values(newErrors)[0];
+    if (firstError) {
+      toast.error(firstError);
+    }
+    
     return Object.keys(newErrors).length === 0;
   };
 
@@ -70,19 +77,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPassword, onSignUp }) => 
       const success = await login(formData.email, formData.password);
       if (success) {
         toast.success('Logged in successfully');
-        router.push('/dashboard');
+        console.log('Login successful, redirecting to dashboard...');
+        // Use replace to avoid back button issues
+        router.replace('/dashboard');
       } else {
         toast.error(ERROR_MESSAGES.GENERIC);
-        setErrors({ email: ERROR_MESSAGES.GENERIC });
       }
     } catch (error: unknown) {
       console.error('Login error:', error);
       if (error instanceof Error && error.message === 'INVALID_CREDENTIALS') {
         toast.error('Invalid email or password');
-        setErrors({ email: 'Invalid email or password' });
       } else {
         toast.error(ERROR_MESSAGES.GENERIC);
-        setErrors({ email: ERROR_MESSAGES.GENERIC });
       }
     } finally {
       setIsLoading(false);

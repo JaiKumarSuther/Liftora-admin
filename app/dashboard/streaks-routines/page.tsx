@@ -55,15 +55,17 @@ const StreaksRoutines: React.FC = () => {
 
   // Filter routines based on search
   const filteredRoutines = routinesData?.data?.filter((routine: UserRoutine) =>
-    routine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    routine.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     routine.description?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
   // Filter streaks based on search
-  const filteredStreaks = streaksData?.data?.filter((streak: { user?: { name?: string; email?: string } }) =>
-    streak.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    streak.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredStreaks = Array.isArray(streaksData?.data) 
+    ? streaksData.data.filter((streak: { user?: { name?: string; email?: string } }) =>
+        streak.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        streak.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   // Loading state
   if (routinesLoading || streaksLoading) {
@@ -87,15 +89,15 @@ const StreaksRoutines: React.FC = () => {
   }
 
   const routines = routinesData?.data || [];
-  const streaks = streaksData?.data || [];
+  const streaks = Array.isArray(streaksData?.data) ? streaksData.data : [];
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="flex min-h-screen bg-gray-900">
       <Sidebar activeNav={activeNav} onNavChange={setActiveNav} />
       
-      <div className="ml-64">
+      <div className="flex-1">
         <Header title="Streaks & Routines" />
-        
+
         <main className="p-8">
           {/* Page Header */}
           <div className="mb-8">
@@ -105,7 +107,7 @@ const StreaksRoutines: React.FC = () => {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <motion.div
+          <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-gray-800 rounded-lg p-6 border border-gray-700"
@@ -134,9 +136,9 @@ const StreaksRoutines: React.FC = () => {
                 </div>
                 <div className="p-3 bg-green-500/10 rounded-lg">
                   <FiTarget className="w-6 h-6 text-green-500" />
-                </div>
-              </div>
-            </motion.div>
+                  </div>
+                  </div>
+                </motion.div>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -150,11 +152,11 @@ const StreaksRoutines: React.FC = () => {
                   <p className="text-2xl font-bold text-white">
                     {new Set(streaks.map((s: { user_id: number }) => s.user_id)).size}
                   </p>
-                </div>
+                                    </div>
                 <div className="p-3 bg-purple-500/10 rounded-lg">
                   <FiUsers className="w-6 h-6 text-purple-500" />
-                </div>
-              </div>
+                                  </div>
+                                </div>
             </motion.div>
 
             <motion.div
@@ -172,18 +174,18 @@ const StreaksRoutines: React.FC = () => {
                       : 0
                     }
                   </p>
-                </div>
+                                    </div>
                 <div className="p-3 bg-yellow-500/10 rounded-lg">
                   <FiTrendingUp className="w-6 h-6 text-yellow-500" />
-                </div>
-              </div>
+                                    </div>
+                                    </div>
             </motion.div>
-          </div>
+                                    </div>
 
           {/* Tabs */}
           <div className="mb-8">
             <div className="flex space-x-1 bg-gray-800 p-1 rounded-lg w-fit">
-              <button
+                                  <button
                 onClick={() => setActiveTab('routines')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'routines'
@@ -192,8 +194,8 @@ const StreaksRoutines: React.FC = () => {
                 }`}
               >
                 Routines ({routines.length})
-              </button>
-              <button
+                                  </button>
+                                <button
                 onClick={() => setActiveTab('streaks')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'streaks'
@@ -202,15 +204,15 @@ const StreaksRoutines: React.FC = () => {
                 }`}
               >
                 Streaks ({streaks.length})
-              </button>
-            </div>
-          </div>
+                                </button>
+                                          </div>
+                                        </div>
 
           {/* Search */}
           <div className="mb-8">
-            <SearchBar
-              value={searchTerm}
-              onChange={setSearchTerm}
+                    <SearchBar
+                      value={searchTerm}
+                      onChange={setSearchTerm}
               placeholder={`Search ${activeTab}...`}
             />
           </div>
@@ -230,7 +232,7 @@ const StreaksRoutines: React.FC = () => {
                   className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors"
                 >
                   <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-white mb-2">{routine.name}</h3>
+                    <h3 className="text-lg font-semibold text-white mb-2">{routine.name || 'Unnamed Routine'}</h3>
                     {routine.description && (
                       <p className="text-gray-400 text-sm">{routine.description}</p>
                     )}
@@ -265,27 +267,27 @@ const StreaksRoutines: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden"
             >
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-700">
-                    <tr>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-700">
+                        <tr>
                       <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         User
-                      </th>
+                          </th>
                       <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Streak Count
-                      </th>
+                          </th>
                       <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Created
-                      </th>
+                          </th>
                       <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                         Last Updated
-                      </th>
+                          </th>
                       <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
                   <tbody className="divide-y divide-gray-700">
                     {filteredStreaks.map((streak: { id: number; user_id: number; count: number; createdAt: string; updatedAt: string; user?: { name?: string; email?: string } }) => (
                       <motion.tr
@@ -294,57 +296,57 @@ const StreaksRoutines: React.FC = () => {
                         animate={{ opacity: 1 }}
                         className="hover:bg-gray-750 transition-colors"
                       >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  <div className="flex-shrink-0 h-10 w-10">
                               <div className="h-10 w-10 rounded-full bg-gray-600 flex items-center justify-center">
                                 <span className="text-sm font-medium text-white">
                                   {streak.user?.name?.charAt(0).toUpperCase() || 'U'}
                                 </span>
-                              </div>
-                            </div>
-                            <div className="ml-4">
+                                    </div>
+                                  </div>
+                                  <div className="ml-4">
                               <div className="text-sm font-medium text-white">
                                 {streak.user?.name || 'Unknown User'}
                               </div>
                               <div className="text-sm text-gray-400">
                                 {streak.user?.email || 'No email'}
                               </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <FiTarget className="w-4 h-4 text-green-500" />
                             <span className="text-lg font-semibold text-white">{streak.count}</span>
-                          </div>
-                        </td>
+                                    </div>
+                              </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                           {formatDate(streak.createdAt)}
-                        </td>
+                              </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                           {formatDate(streak.updatedAt)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                  <button
                             onClick={() => handleViewStreak(streak)}
                             className="text-blue-400 hover:text-blue-300 transition-colors"
-                          >
-                            <FiEye className="w-4 h-4" />
-                          </button>
-                        </td>
+                                  >
+                                    <FiEye className="w-4 h-4" />
+                                  </button>
+                              </td>
                       </motion.tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </motion.div>
-          )}
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </motion.div>
+            )}
         </main>
       </div>
 
       {/* Routine Details Modal */}
-      <Modal
+        <Modal
         isOpen={isRoutineModalOpen}
         onClose={() => setIsRoutineModalOpen(false)}
         title="Routine Details"
@@ -352,22 +354,22 @@ const StreaksRoutines: React.FC = () => {
         {selectedRoutine && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-xl font-semibold text-white mb-2">{selectedRoutine.name}</h3>
+              <h3 className="text-xl font-semibold text-white mb-2">{selectedRoutine.name || 'Unnamed Routine'}</h3>
               {selectedRoutine.description && (
                 <p className="text-gray-300 mb-4">{selectedRoutine.description}</p>
-              )}
-            </div>
+                  )}
+                </div>
             
             <div className="grid grid-cols-2 gap-4">
-              <div>
+                <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Created</label>
                 <p className="text-white">{formatDate(selectedRoutine.createdAt)}</p>
-              </div>
+                </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Last Updated</label>
                 <p className="text-white">{formatDate(selectedRoutine.updatedAt)}</p>
               </div>
-            </div>
+                  </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Tasks</label>
@@ -385,7 +387,7 @@ const StreaksRoutines: React.FC = () => {
                 )}
               </div>
             </div>
-          </div>
+                    </div>
         )}
       </Modal>
 
@@ -397,31 +399,31 @@ const StreaksRoutines: React.FC = () => {
       >
         {selectedStreak && (
           <div className="space-y-4">
-            <div>
+                  <div>
               <h3 className="text-xl font-semibold text-white mb-2">User Streak</h3>
-            </div>
-            
+                  </div>
+
             <div className="grid grid-cols-2 gap-4">
-              <div>
+                  <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">User</label>
                 <p className="text-white">{(selectedStreak as { user?: { name?: string } }).user?.name || 'Unknown User'}</p>
-              </div>
-              <div>
+                  </div>
+                  <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
                 <p className="text-white">{(selectedStreak as { user?: { email?: string } }).user?.email || 'No email'}</p>
-              </div>
-              <div>
+                  </div>
+                  <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Streak Count</label>
                 <p className="text-white text-2xl font-bold">{selectedStreak.count}</p>
-              </div>
-              <div>
+                  </div>
+                  <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Created</label>
                 <p className="text-white">{formatDate(selectedStreak.createdAt)}</p>
-              </div>
+                  </div>
             </div>
           </div>
         )}
-      </Modal>
+        </Modal>
     </div>
   );
 };

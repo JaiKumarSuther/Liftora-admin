@@ -144,10 +144,10 @@ const MotivationalQuotes: React.FC = () => {
   const pagination = quotesData?.pagination;
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="flex min-h-screen bg-gray-900">
       <Sidebar activeNav={activeNav} onNavChange={setActiveNav} />
       
-      <div className="ml-64">
+      <div className="flex-1">
         <Header title="Motivational Quotes" />
         
         <main className="p-8">

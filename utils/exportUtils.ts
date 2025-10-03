@@ -58,7 +58,7 @@ export interface ExportUserData {
 export const exportUsersToExcel = async (selectedUserIds?: string[]): Promise<void> => {
   try {
     // Fetch complete user data from backend
-    const response = await api.get('/api/v2/user/getUsers', { 
+    const response = await api.get('/user/getUsers', { 
       params: { 
         page: 1, 
         limit: 1000 // Get all users for export
@@ -185,7 +185,7 @@ export const exportUsersToExcel = async (selectedUserIds?: string[]): Promise<vo
 export const exportEventsToExcel = async (selectedEventIds?: string[]): Promise<void> => {
   try {
     // Fetch complete event data from backend
-    const response = await api.get('/api/v2/host-event', { 
+    const response = await api.get('/host-event', { 
       params: { 
         page: 1, 
         limit: 1000 // Get all events for export

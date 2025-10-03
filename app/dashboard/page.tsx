@@ -60,6 +60,7 @@ const Dashboard: React.FC = () => {
     interval: 'day'
   });
 
+
   // Filter options
   const periodOptions = [
     { value: '7d', label: 'Last 7 Days', type: 'period' as const },
@@ -69,33 +70,54 @@ const Dashboard: React.FC = () => {
 
   // Transform API data to dashboard format
   const dashboardData = useMemo(() => {
-    if (!statsData?.data) return null;
+    if (!statsData?.data) {
+      // Return fallback data if API data is not available
+      return {
+        overview: {
+          totalUsers: 0,
+          activeUsers: 0,
+          totalSubscriptions: 0,
+          totalRevenue: 0,
+          totalAIInteractions: 0,
+          totalStreaks: 0,
+          totalRoutines: 0,
+          engagementRate: 0
+        },
+        recentActivity: {
+          newUsers: 0,
+          newSubscriptions: 0,
+          newAIInteractions: 0,
+          newStreaks: 0
+        },
+        timeSeriesData: []
+      };
+    }
 
     const stats = statsData.data;
     return {
       overview: {
-        totalUsers: stats.users.total,
-        activeUsers: stats.users.active,
-        totalSubscriptions: stats.subscriptions.total,
-        totalRevenue: stats.subscriptions.revenue.total,
-        totalAIInteractions: stats.content.totalAIQuotes,
+        totalUsers: stats.users?.total || 0,
+        activeUsers: stats.users?.active || 0,
+        totalSubscriptions: stats.subscriptions?.total || 0,
+        totalRevenue: stats.subscriptions?.revenue?.total || 0,
+        totalAIInteractions: stats.content?.totalAIQuotes || 0,
         totalStreaks: 0, // Not available in current API
         totalRoutines: 0, // Not available in current API
-        engagementRate: stats.users.active > 0 ? (stats.users.active / stats.users.total) * 100 : 0
+        engagementRate: stats.users?.active > 0 ? (stats.users.active / stats.users.total) * 100 : 0
       },
       recentActivity: {
-        newUsers: stats.users.newToday,
-        newSubscriptions: stats.subscriptions.active,
-        newAIInteractions: stats.content.totalAIQuotes,
+        newUsers: stats.users?.newToday || 0,
+        newSubscriptions: stats.subscriptions?.active || 0,
+        newAIInteractions: stats.content?.totalAIQuotes || 0,
         newStreaks: 0 // Not available in current API
       },
-      timeSeriesData: stats.growth.dailySignups.map((item: { date: string; count: number }) => ({
+      timeSeriesData: stats.growth?.dailySignups?.map((item: { date: string; count: number }) => ({
         date: item.date,
         users: item.count,
         subscriptions: 0, // Not available in current API
         aiInteractions: 0, // Not available in current API
         revenue: 0 // Not available in current API
-      }))
+      })) || []
     };
   }, [statsData]);
 
@@ -109,54 +131,42 @@ const Dashboard: React.FC = () => {
         value: dashboardData.overview.totalUsers.toLocaleString(),
         icon: FiUsers,
         iconBg: 'bg-blue-500/10',
-        iconColor: 'text-blue-500',
-        change: '+12.5%', // Static for now
-        changeType: 'positive' as const
+        iconColor: 'text-blue-500'
       },
       {
         title: 'Active Users',
         value: dashboardData.overview.activeUsers.toLocaleString(),
         icon: FiActivity,
         iconBg: 'bg-green-500/10',
-        iconColor: 'text-green-500',
-        change: '+8.2%', // Static for now
-        changeType: 'positive' as const
+        iconColor: 'text-green-500'
       },
       {
         title: 'Total Revenue',
         value: `$${dashboardData.overview.totalRevenue.toLocaleString()}`,
         icon: FiDollarSign,
         iconBg: 'bg-yellow-500/10',
-        iconColor: 'text-yellow-500',
-        change: '+15.3%', // Static for now
-        changeType: 'positive' as const
+        iconColor: 'text-yellow-500'
       },
       {
         title: 'AI Interactions',
         value: dashboardData.overview.totalAIInteractions.toLocaleString(),
         icon: FiMessageSquare,
         iconBg: 'bg-purple-500/10',
-        iconColor: 'text-purple-500',
-        change: '+23.1%', // Static for now
-        changeType: 'positive' as const
+        iconColor: 'text-purple-500'
       },
       {
         title: 'Active Streaks',
         value: dashboardData.overview.totalStreaks.toLocaleString(),
         icon: FiTarget,
         iconBg: 'bg-red-500/10',
-        iconColor: 'text-red-500',
-        change: '+5.7%', // Static for now
-        changeType: 'positive' as const
+        iconColor: 'text-red-500'
       },
       {
         title: 'Total Routines',
         value: dashboardData.overview.totalRoutines.toLocaleString(),
         icon: FiCalendar,
         iconBg: 'bg-indigo-500/10',
-        iconColor: 'text-indigo-500',
-        change: '+18.9%', // Static for now
-        changeType: 'positive' as const
+        iconColor: 'text-indigo-500'
       }
     ];
   }, [dashboardData]);
@@ -197,32 +207,12 @@ const Dashboard: React.FC = () => {
     ];
   }, [dashboardData]);
 
-  // Loading state
-  if (statsLoading || analyticsLoading) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
-  // Error state
-  if (statsError) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Error Loading Dashboard</h2>
-          <p className="text-gray-400">Failed to load dashboard data. Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="flex min-h-screen bg-gray-900">
       <Sidebar activeNav={activeNav} onNavChange={setActiveNav} />
       
-      <div className="ml-64">
+      <div className="flex-1">
         <Header title="Dashboard" />
         
         <main className="p-8">
@@ -244,6 +234,25 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
+          {/* Loading indicator */}
+          {(statsLoading || analyticsLoading) && (
+            <div className="mb-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <div className="flex items-center gap-3">
+                <LoadingSpinner size="sm" />
+                <span className="text-blue-400">Loading dashboard data...</span>
+              </div>
+            </div>
+          )}
+
+          {/* Error indicator */}
+          {statsError && (
+            <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <div className="flex items-center gap-3">
+                <span className="text-red-400">⚠️ Failed to load some dashboard data. Showing cached or default values.</span>
+              </div>
+            </div>
+          )}
+
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
             {kpiCards.map((kpi) => (
@@ -254,15 +263,10 @@ const Dashboard: React.FC = () => {
                 transition={{ delay: 0.1 }}
                 className="bg-gray-800 rounded-lg p-6 border border-gray-700"
               >
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center mb-4">
                   <div className={`p-3 rounded-lg ${kpi.iconBg}`}>
                     <kpi.icon className={`w-6 h-6 ${kpi.iconColor}`} />
                   </div>
-                  <span className={`text-sm font-medium ${
-                    kpi.changeType === 'positive' ? 'text-green-400' : 'text-red-400'
-                  }`}>
-                    {kpi.change}
-                  </span>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-1">{kpi.value}</h3>
                 <p className="text-gray-400 text-sm">{kpi.title}</p>

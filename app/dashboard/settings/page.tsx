@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
   FiUser, 
-  FiShield
+  FiShield,
+  FiChevronDown,
+  FiChevronUp
 } from 'react-icons/fi';
 import Sidebar from '../../../components/UI/Sidebar';
 import Header from '../../../components/UI/Header';
@@ -21,13 +23,13 @@ const Settings: React.FC = () => {
   const [activeNav, setActiveNav] = useState('settings');
   const [activeTab, setActiveTab] = useState('profile');
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isTimezoneDropdownOpen, setIsTimezoneDropdownOpen] = useState(false);
   const { user, updateUser } = useAuth();
   const queryClient = useQueryClient();
 
   // Form states
   const [profileData, setProfileData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     phone: '',
     timezone: 'UTC-5 (Eastern Time)'
@@ -39,15 +41,27 @@ const Settings: React.FC = () => {
     confirmPassword: ''
   });
 
-  // Fetch admin profile data
+  // Fetch admin profile data - use user endpoint since admin endpoint has field mismatch
   const { data: adminProfile, isLoading: profileLoading } = useQuery({
     queryKey: ['admin-profile', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const { data } = await api.get(API_ENDPOINTS.ADMIN.PROFILE, {
-        params: { userId: user.id }
-      });
-      return data?.data || null;
+      try {
+        // Use user endpoint since admin endpoint has firstName/lastName field issues
+        const { data } = await api.get(API_ENDPOINTS.USERS.LIST, {
+          params: { userId: user.id }
+        });
+        return data?.user || null;
+      } catch (error) {
+        console.warn('User profile endpoint failed, using fallback data:', error);
+        // Fallback to user data if endpoint fails
+        return {
+          name: user.name || '',
+          email: user.email || '',
+          contact: '',
+          profilePic: user.avatarUrl || ''
+        };
+      }
     },
     enabled: !!user?.id
   });
@@ -55,21 +69,34 @@ const Settings: React.FC = () => {
   // Update profile data when admin profile is loaded
   useEffect(() => {
     if (adminProfile) {
+      // Handle both admin profile format and user profile format
       setProfileData({
-        firstName: adminProfile.firstName || '',
-        lastName: adminProfile.lastName || '',
+        name: adminProfile.name || adminProfile.fullName || '',
         email: adminProfile.email || '',
-        phone: adminProfile.phone || '',
+        phone: adminProfile.contact || adminProfile.phone || '',
         timezone: adminProfile.timezone || 'UTC-5 (Eastern Time)'
       });
+    } else if (user) {
+      // Fallback to user data if no admin profile
+      setProfileData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: '',
+        timezone: 'UTC-5 (Eastern Time)'
+      });
     }
-  }, [adminProfile]);
+  }, [adminProfile, user]);
 
-  // Update profile mutation
+  // Update profile mutation - use user endpoint since admin endpoint has field issues
   const updateProfile = useMutation({
     mutationFn: async (data: typeof profileData) => {
       if (!user?.id) throw new Error('User ID not found');
-      const response = await api.put(API_ENDPOINTS.ADMIN.PROFILE, data, {
+      // Use user endpoint directly since admin endpoint has firstName/lastName field issues
+      const response = await api.put(API_ENDPOINTS.USERS.UPDATE, {
+        name: data.name.trim(),
+        email: data.email,
+        contact: data.phone
+      }, {
         params: { userId: user.id }
       });
       return response.data;
@@ -86,16 +113,14 @@ const Settings: React.FC = () => {
     }
   });
 
-  // Update password mutation
+  // Update password mutation - use user endpoint since admin endpoint has field issues
   const updatePassword = useMutation({
     mutationFn: async (data: typeof securityData) => {
       if (!user?.id) throw new Error('User ID not found');
-      const response = await api.put(API_ENDPOINTS.ADMIN.PASSWORD, {
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
-        confirmPassword: data.confirmPassword
-      }, {
-        params: { userId: user.id }
+      // Use user password reset endpoint since admin endpoint has field issues
+      const response = await api.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, {
+        email: user.email,
+        password: data.newPassword
       });
       return response.data;
     },
@@ -120,16 +145,86 @@ const Settings: React.FC = () => {
     setActiveNav(navId);
   };
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isTimezoneDropdownOpen) {
+        setIsTimezoneDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [isTimezoneDropdownOpen]);
+
   const handleSave = async () => {
     if (activeTab === 'profile') {
+      // Validate profile data
+      if (!profileData.name.trim()) {
+        toast.error('Name is required');
+        return;
+      }
+      
+      if (!profileData.email.trim()) {
+        toast.error('Email is required');
+        return;
+      }
+      
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(profileData.email)) {
+        toast.error('Please enter a valid email address');
+        return;
+      }
+      
       updateProfile.mutate(profileData);
     } else if (activeTab === 'security') {
-      if (securityData.currentPassword && securityData.newPassword && securityData.confirmPassword) {
-        updatePassword.mutate(securityData);
-      } else {
+      if (!securityData.currentPassword || !securityData.newPassword || !securityData.confirmPassword) {
         toast.error('Please fill in all password fields');
+        return;
       }
+      
+      if (securityData.newPassword.length < 8) {
+        toast.error('New password must be at least 8 characters long');
+        return;
+      }
+      
+      if (securityData.newPassword !== securityData.confirmPassword) {
+        toast.error('New password and confirm password do not match');
+        return;
+      }
+      
+      updatePassword.mutate(securityData);
     }
+  };
+
+  const handleCancel = () => {
+    if (activeTab === 'profile') {
+      // Reset profile data to original values
+      if (adminProfile) {
+        setProfileData({
+          name: adminProfile.name || adminProfile.fullName || '',
+          email: adminProfile.email || '',
+          phone: adminProfile.contact || adminProfile.phone || '',
+          timezone: adminProfile.timezone || 'UTC-5 (Eastern Time)'
+        });
+      } else if (user) {
+        setProfileData({
+          name: user.name || '',
+          email: user.email || '',
+          phone: '',
+          timezone: 'UTC-5 (Eastern Time)'
+        });
+      }
+    } else if (activeTab === 'security') {
+      // Clear security data
+      setSecurityData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+    }
+    toast.info('Changes discarded');
   };
 
   const tabs = [
@@ -160,13 +255,21 @@ const Settings: React.FC = () => {
       setIsUploadingAvatar(true);
       const form = new FormData();
       form.append('profilePic', file);
-      const res = await api.put(`${API_ENDPOINTS.USERS.UPLOAD_PROFILE_PIC}?userId=${user.id}`, form, {
+      
+      // Use the correct API endpoint for profile image upload
+      const res = await api.put(API_ENDPOINTS.USERS.UPDATE, form, {
+        params: { userId: user.id },
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+      
       const updated = res.data?.user;
       if (updated?.profilePic) {
         updateUser({ avatarUrl: updated.profilePic });
         toast.success('Profile picture updated successfully');
+      } else if (res.data?.status) {
+        toast.success('Profile picture updated successfully');
+        // Refresh the profile data
+        queryClient.invalidateQueries({ queryKey: ['admin-profile', user?.id] });
       }
     } catch (err: unknown) {
       console.error('Failed to upload avatar', err);
@@ -186,44 +289,36 @@ const Settings: React.FC = () => {
     <div className="space-y-6">
       {/* Avatar Upload */}
       <div className="flex items-center gap-4">
-        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 bg-gray-100 flex items-center justify-center">
+        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-600 bg-gray-700 flex items-center justify-center">
           {user?.avatarUrl ? (
             <Image src={user.avatarUrl} alt="Avatar" width={64} height={64} className="w-full h-full object-cover" />
           ) : (
-            <span className="text-sm font-semibold text-gray-700">
+            <span className="text-sm font-semibold text-gray-300">
               {user?.initials}
             </span>
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Profile Image</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Profile Image</label>
           <div className="flex items-center gap-3">
-            <label className={`px-3 py-2 rounded-md border text-sm cursor-pointer ${isUploadingAvatar ? 'opacity-60 cursor-not-allowed' : 'hover:bg-gray-700'}`}>
+            <label className={`px-3 py-2 rounded-md border border-gray-600 text-sm cursor-pointer text-gray-300 ${isUploadingAvatar ? 'opacity-60 cursor-not-allowed' : 'hover:bg-gray-700 hover:text-white'}`}>
               <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={isUploadingAvatar} />
               {isUploadingAvatar ? 'Uploading...' : 'Upload Image'}
             </label>
             {user?.avatarUrl && (
-              <a href={user.avatarUrl} target="_blank" rel="noreferrer" className="text-xs text-gray-500 underline">View current</a>
+              <a href={user.avatarUrl} target="_blank" rel="noreferrer" className="text-xs text-gray-400 underline hover:text-gray-300">View current</a>
             )}
           </div>
-          <p className="text-xs text-gray-500 mt-1">Uploads immediately and is independent of Save Changes.</p>
+          <p className="text-xs text-gray-400 mt-1">Uploads immediately and is independent of Save Changes.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input
-          label="First Name"
-          value={profileData.firstName}
-          onChange={(value) => setProfileData({ ...profileData, firstName: value })}
-          placeholder="Enter first name"
-        />
-        <Input
-          label="Last Name"
-          value={profileData.lastName}
-          onChange={(value) => setProfileData({ ...profileData, lastName: value })}
-          placeholder="Enter last name"
-        />
-      </div>
+      <Input
+        label="Full Name"
+        value={profileData.name}
+        onChange={(value) => setProfileData({ ...profileData, name: value })}
+        placeholder="Enter your full name"
+      />
       <Input
         label="Email Address"
         type="email"
@@ -238,20 +333,46 @@ const Settings: React.FC = () => {
         onChange={(value) => setProfileData({ ...profileData, phone: value })}
         placeholder="Enter phone number"
       />
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="relative">
+        <label className="block text-sm font-medium text-gray-300 mb-2">
           Timezone
         </label>
-        <select
-          value={profileData.timezone}
-          onChange={(e) => setProfileData({ ...profileData, timezone: e.target.value })}
-          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-fuchsia-500 focus:border-fuchsia-500"
+        <button
+          type="button"
+          onClick={() => setIsTimezoneDropdownOpen(!isTimezoneDropdownOpen)}
+          className="flex items-center justify-between w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-gray-300 focus:outline-none focus:ring-coral-500 focus:border-coral-500"
         >
-          <option value="UTC-5 (Eastern Time)">UTC-5 (Eastern Time)</option>
-          <option value="UTC-6 (Central Time)">UTC-6 (Central Time)</option>
-          <option value="UTC-7 (Mountain Time)">UTC-7 (Mountain Time)</option>
-          <option value="UTC-8 (Pacific Time)">UTC-8 (Pacific Time)</option>
-        </select>
+          <span>{profileData.timezone}</span>
+          {isTimezoneDropdownOpen ? (
+            <FiChevronUp className="w-4 h-4 text-gray-400" />
+          ) : (
+            <FiChevronDown className="w-4 h-4 text-gray-400" />
+          )}
+        </button>
+        {isTimezoneDropdownOpen && (
+          <div className="absolute z-10 w-full mt-1 bg-gray-700 border border-gray-600 rounded-md shadow-lg">
+            {[
+              'UTC-5 (Eastern Time)',
+              'UTC-6 (Central Time)',
+              'UTC-7 (Mountain Time)',
+              'UTC-8 (Pacific Time)'
+            ].map((timezone) => (
+              <button
+                key={timezone}
+                type="button"
+                onClick={() => {
+                  setProfileData({ ...profileData, timezone });
+                  setIsTimezoneDropdownOpen(false);
+                }}
+                className={`w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-600 ${
+                  profileData.timezone === timezone ? 'bg-coral-500 text-white' : ''
+                }`}
+              >
+                {timezone}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -301,7 +422,7 @@ const Settings: React.FC = () => {
       <Sidebar activeNav={activeNav} onNavChange={handleNavChange} />
 
       {/* Main Content */}
-      <div className="flex-1 lg:ml-0">
+      <div className="flex-1">
         {/* Header */}
         <Header title="Settings" />
 
@@ -340,7 +461,11 @@ const Settings: React.FC = () => {
 
             {/* Action Buttons */}
             <div className="flex items-center justify-end space-x-3 px-6 py-4 border-t border-gray-700">
-              <Button variant="secondary" onClick={() => console.log('Cancel clicked')}>
+              <Button 
+                variant="secondary" 
+                onClick={handleCancel}
+                disabled={updateProfile.isPending || updatePassword.isPending}
+              >
                 Cancel
               </Button>
               <Button 

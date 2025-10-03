@@ -66,7 +66,7 @@ const UserDetailsPage: React.FC = () => {
   const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ['user-details-admin', userId],
     queryFn: async () => {
-      const { data } = await api.get(`/api/v2/user/getUsers`, { 
+      const { data } = await api.get(`/user/getUsers`, { 
         params: { userId: userId } 
       });
       return data?.user as UserDetails || null;
@@ -152,7 +152,7 @@ const UserDetailsPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-900 flex">
         <Sidebar activeNav={activeNav} onNavChange={handleNavChange} />
-        <div className="flex-1 lg:ml-0">
+        <div className="flex-1">
           <Header title="User Details" />
           <main className="p-4 sm:p-6 lg:p-8">
             <div className="flex items-center justify-center h-[400px]">
@@ -168,7 +168,7 @@ const UserDetailsPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-900 flex">
         <Sidebar activeNav={activeNav} onNavChange={handleNavChange} />
-        <div className="flex-1 lg:ml-0">
+        <div className="flex-1">
           <Header title="User Details" />
           <main className="p-4 sm:p-6 lg:p-8">
             <div className="text-center py-12">

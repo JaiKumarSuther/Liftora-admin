@@ -80,25 +80,25 @@ export const VALIDATION = {
 // API endpoints
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: '/api/v2/user/signin',
-    LOGOUT: '/api/v2/user/logout',
-    FORGOT_PASSWORD: '/api/v2/user/resetPassword',
-    SIGNUP: '/api/v2/user/signup',
+    LOGIN: '/user/signin',
+    LOGOUT: '/user/logout',
+    FORGOT_PASSWORD: '/user/resetPassword',
+    SIGNUP: '/user/signup',
   },
   USERS: {
-    LIST: '/api/v2/user/getUsers',
-    UPDATE: '/api/v2/user/editUser',
-    DELETE: '/api/v2/user/account',
-    UPLOAD_PROFILE_PIC: '/api/v2/user/profilePic',
+    LIST: '/user/getUsers',
+    UPDATE: '/user/editUser',
+    DELETE: '/user/account',
+    UPLOAD_PROFILE_PIC: '/user/profilePic',
   },
   REPORTS: {
-    DOWNLOAD: '/api/reports/download',
+    DOWNLOAD: '/reports/download',
   },
   ADMIN: {
-    STATS: '/api/v2/admin/stats',
-    DASHBOARD_ANALYTICS: '/api/v2/admin/dashboard-analytics',
-    PROFILE: '/api/v2/admin/profile',
-    PASSWORD: '/api/v2/admin/password',
+    STATS: '/admin/stats',
+    DASHBOARD_ANALYTICS: '/admin/dashboard-analytics',
+    PROFILE: '/admin/profile',
+    PASSWORD: '/admin/password',
   }
 } as const;
 

@@ -1,9 +1,4 @@
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Liftora - Admin Dashboard",
-  description: "Liftora Admin Dashboard - Complete User Management & Analytics",
-};
+'use client';
 
 export default function DashboardLayout({
   children,

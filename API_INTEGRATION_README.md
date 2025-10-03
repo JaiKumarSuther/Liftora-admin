@@ -9,10 +9,7 @@ The admin panel has been completely integrated with the backend APIs, removing a
 ## API Configuration
 
 ### API Clients
-- **api8001**: User management services (port 8001)
-- **api8002**: Authentication and analytics services (port 8002)  
-- **api8003**: Routines, quotes, and rewards services (port 8003)
-- **api8004**: Statistics services (port 8004)
+- **apiClient**: Single API client for all services using base URL from environment variables
 
 ### Authentication
 - JWT token-based authentication
