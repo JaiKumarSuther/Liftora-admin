@@ -213,11 +213,29 @@ export interface RewardEvent {
 export interface UserRoutine {
   id: number;
   user_id: number;
-  name?: string;
-  description?: string;
-  tasks: any[];
+  routine_preference?: string;
+  focus_area?: string;
+  daily_goal_duration?: number;
+  time_and_duration?: string;
+  custom_input?: string;
+  available_time?: string;
+  feeling_today?: string;
+  ai_generated?: {
+    [key: string]: Array<{
+      task: string;
+      time: string;
+      details?: string;
+    }>;
+  };
+  isAccept?: boolean;
+  day?: string;
   createdAt: string;
   updatedAt: string;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+  };
 }
 
 export interface UserStreak {
@@ -226,6 +244,11 @@ export interface UserStreak {
   count: number;
   createdAt: string;
   updatedAt: string;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+  };
 }
 
 export interface AIConversation {

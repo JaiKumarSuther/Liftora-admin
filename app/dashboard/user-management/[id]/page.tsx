@@ -66,7 +66,7 @@ const UserDetailsPage: React.FC = () => {
   const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ['user-details-admin', userId],
     queryFn: async () => {
-      const { data } = await api.get(`/user/getUsers`, { 
+      const { data } = await api.get(`/admin/user/getUsers`, { 
         params: { userId: userId } 
       });
       return data?.user as UserDetails || null;

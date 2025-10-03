@@ -200,12 +200,22 @@ export const routineService = {
 
   getAllUserStreaks: async () => {
     try {
-      const response = await apiClient.get('/users/streaks/all'); // Get all user streaks
+      const response = await apiClient.get('/admin/users/streaks/all'); // Get all user streaks
       return response.data;
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to fetch all user streaks';
-      toast.error(message);
-      throw error;
+      console.error('Streaks API Error with /admin/streaks:', error);
+      try {
+        // Fallback to the original endpoint
+        console.log('Trying fallback endpoint: /admin/users/streaks/all');
+        const fallbackResponse = await apiClient.get('/admin/users/streaks/all');
+        console.log('Streaks Fallback API Response:', fallbackResponse.data);
+        return fallbackResponse.data;
+      } catch (fallbackError: any) {
+        console.error('Streaks API Error with fallback:', fallbackError);
+        const message = fallbackError.response?.data?.message || 'Failed to fetch all user streaks';
+        toast.error(message);
+        throw fallbackError;
+      }
     }
   },
 };

@@ -58,7 +58,7 @@ export interface ExportUserData {
 export const exportUsersToExcel = async (selectedUserIds?: string[]): Promise<void> => {
   try {
     // Fetch complete user data from backend
-    const response = await api.get('/user/getUsers', { 
+    const response = await api.get('/admin/user/getUsers', { 
       params: { 
         page: 1, 
         limit: 1000 // Get all users for export

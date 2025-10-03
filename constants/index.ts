@@ -86,7 +86,7 @@ export const API_ENDPOINTS = {
     SIGNUP: '/user/signup',
   },
   USERS: {
-    LIST: '/user/getUsers',
+    LIST: '/admin/users/',
     UPDATE: '/user/editUser',
     DELETE: '/user/account',
     UPLOAD_PROFILE_PIC: '/user/profilePic',

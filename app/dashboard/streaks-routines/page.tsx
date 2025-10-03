@@ -54,17 +54,28 @@ const StreaksRoutines: React.FC = () => {
   };
 
   // Filter routines based on search
-  const filteredRoutines = routinesData?.data?.filter((routine: UserRoutine) =>
-    routine.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    routine.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredRoutines = routinesData?.data?.filter((routine: UserRoutine) => {
+    if (!searchTerm.trim()) return true; // Show all if no search term
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      routine.routine_preference?.toLowerCase().includes(searchLower) ||
+      routine.focus_area?.toLowerCase().includes(searchLower) ||
+      routine.custom_input?.toLowerCase().includes(searchLower) ||
+      routine.user?.name?.toLowerCase().includes(searchLower) ||
+      routine.user?.email?.toLowerCase().includes(searchLower)
+    );
+  }) || [];
 
   // Filter streaks based on search
   const filteredStreaks = Array.isArray(streaksData?.data) 
-    ? streaksData.data.filter((streak: { user?: { name?: string; email?: string } }) =>
-        streak.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        streak.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    ? streaksData.data.filter((streak: UserStreak) => {
+        if (!searchTerm.trim()) return true; // Show all if no search term
+        const searchLower = searchTerm.toLowerCase();
+        return (
+          streak.user?.name?.toLowerCase().includes(searchLower) ||
+          streak.user?.email?.toLowerCase().includes(searchLower)
+        );
+      })
     : [];
 
   // Loading state
@@ -90,6 +101,15 @@ const StreaksRoutines: React.FC = () => {
 
   const routines = routinesData?.data || [];
   const streaks = Array.isArray(streaksData?.data) ? streaksData.data : [];
+
+  // Debug logging
+  console.log('Routines Data:', routinesData);
+  console.log('Streaks Data:', streaksData);
+  console.log('Streaks Loading:', streaksLoading);
+  console.log('Streaks Error:', streaksError);
+  console.log('Filtered Routines:', filteredRoutines);
+  console.log('Filtered Streaks:', filteredStreaks);
+  console.log('Search Term:', searchTerm);
 
   return (
     <div className="flex min-h-screen bg-gray-900">
@@ -217,6 +237,23 @@ const StreaksRoutines: React.FC = () => {
             />
           </div>
 
+          {/* Debug Info - Remove this after fixing */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mb-8 p-4 bg-gray-800 rounded-lg border border-gray-600">
+              <h4 className="text-white font-medium mb-2">Debug Info:</h4>
+              <div className="text-sm text-gray-300 space-y-1">
+                <p>Streaks Loading: {streaksLoading ? 'Yes' : 'No'}</p>
+                <p>Streaks Error: {streaksError ? 'Yes' : 'No'}</p>
+                <p>Streaks Data Length: {streaksData?.data?.length || 0}</p>
+                <p>Filtered Streaks Length: {filteredStreaks.length}</p>
+                <p>Search Term: "{searchTerm}"</p>
+                {streaksError && (
+                  <p className="text-red-400">Error: {JSON.stringify(streaksError)}</p>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Routines Tab */}
           {activeTab === 'routines' && (
             <motion.div
@@ -224,7 +261,8 @@ const StreaksRoutines: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {filteredRoutines.map((routine: UserRoutine) => (
+              {filteredRoutines.length > 0 ? (
+                filteredRoutines.map((routine: UserRoutine) => (
                 <motion.div
                   key={routine.id}
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -232,19 +270,31 @@ const StreaksRoutines: React.FC = () => {
                   className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors"
                 >
                   <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-white mb-2">{routine.name || 'Unnamed Routine'}</h3>
-                    {routine.description && (
-                      <p className="text-gray-400 text-sm">{routine.description}</p>
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      {routine.routine_preference || 'Routine'}
+                    </h3>
+                    {routine.focus_area && (
+                      <p className="text-gray-400 text-sm mb-2">Focus: {routine.focus_area}</p>
+                    )}
+                    {routine.time_and_duration && (
+                      <p className="text-gray-400 text-sm">Time: {routine.time_and_duration}</p>
+                    )}
+                    {routine.day && (
+                      <p className="text-blue-400 text-sm">Day: {routine.day}</p>
                     )}
                   </div>
                   
-                  <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
-                    <div className="flex items-center gap-1">
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                      <FiUsers className="w-4 h-4" />
+                      <span>{routine.user?.name || 'Unknown User'}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-gray-400 mb-2">
                       <FiCalendar className="w-4 h-4" />
                       <span>Created {formatDate(routine.createdAt)}</span>
                     </div>
                     <span className="px-2 py-1 bg-gray-700 rounded text-xs">
-                      {routine.tasks?.length || 0} tasks
+                      {routine.daily_goal_duration || 0} min goal
                     </span>
                   </div>
 
@@ -256,7 +306,16 @@ const StreaksRoutines: React.FC = () => {
                     View Details
                   </button>
                 </motion.div>
-              ))}
+                ))
+              ) : (
+                <div className="col-span-full text-center py-12">
+                  <div className="text-gray-400 mb-4">
+                    <FiCalendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <h3 className="text-lg font-medium mb-2">No Routines Found</h3>
+                    <p>No routines match your search criteria.</p>
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -289,7 +348,7 @@ const StreaksRoutines: React.FC = () => {
                         </tr>
                       </thead>
                   <tbody className="divide-y divide-gray-700">
-                    {filteredStreaks.map((streak: { id: number; user_id: number; count: number; createdAt: string; updatedAt: string; user?: { name?: string; email?: string } }) => (
+                    {filteredStreaks.map((streak: UserStreak) => (
                       <motion.tr
                         key={streak.id}
                         initial={{ opacity: 0 }}
@@ -340,6 +399,22 @@ const StreaksRoutines: React.FC = () => {
                       </tbody>
                     </table>
                   </div>
+                  {filteredStreaks.length === 0 && !streaksLoading && (
+                    <div className="text-center py-12">
+                      <div className="text-gray-400 mb-4">
+                        <FiTarget className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <h3 className="text-lg font-medium mb-2">
+                          {streaksError ? 'Error Loading Streaks' : 
+                           searchTerm.trim() ? 'No Streaks Found' : 'No Streaks Available'}
+                        </h3>
+                        <p>
+                          {streaksError ? 'Failed to load streaks data. Please try again later.' :
+                           searchTerm.trim() ? 'No streaks match your search criteria.' :
+                           'There are no streaks recorded yet.'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
             )}
         </main>
@@ -354,40 +429,82 @@ const StreaksRoutines: React.FC = () => {
         {selectedRoutine && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-xl font-semibold text-white mb-2">{selectedRoutine.name || 'Unnamed Routine'}</h3>
-              {selectedRoutine.description && (
-                <p className="text-gray-300 mb-4">{selectedRoutine.description}</p>
-                  )}
-                </div>
+              <h3 className="text-xl font-semibold text-white mb-2">
+                {selectedRoutine.routine_preference || 'Routine'}
+              </h3>
+              {selectedRoutine.focus_area && (
+                <p className="text-gray-300 mb-2">Focus Area: {selectedRoutine.focus_area}</p>
+              )}
+              {selectedRoutine.time_and_duration && (
+                <p className="text-gray-300 mb-2">Time: {selectedRoutine.time_and_duration}</p>
+              )}
+              {selectedRoutine.day && (
+                <p className="text-blue-400 mb-2">Day: {selectedRoutine.day}</p>
+              )}
+            </div>
             
             <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">User</label>
+                <p className="text-white">{selectedRoutine.user?.name || 'Unknown User'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                <p className="text-white">{selectedRoutine.user?.email || 'No email'}</p>
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Created</label>
                 <p className="text-white">{formatDate(selectedRoutine.createdAt)}</p>
-                </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Last Updated</label>
-                <p className="text-white">{formatDate(selectedRoutine.updatedAt)}</p>
               </div>
-                  </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Goal Duration</label>
+                <p className="text-white">{selectedRoutine.daily_goal_duration || 0} minutes</p>
+              </div>
+            </div>
+
+            {selectedRoutine.custom_input && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Custom Input</label>
+                <div className="bg-gray-700 p-3 rounded-lg">
+                  <p className="text-white text-sm">{selectedRoutine.custom_input}</p>
+                </div>
+              </div>
+            )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Tasks</label>
-              <div className="bg-gray-700 p-4 rounded-lg">
-                {selectedRoutine.tasks && selectedRoutine.tasks.length > 0 ? (
-                  <ul className="space-y-2">
-                    {selectedRoutine.tasks.map((task: { id: number; title: string; description?: string; completed: boolean }, index: number) => (
-                      <li key={index} className="text-white text-sm">
-                        • {task.title || `Task ${index + 1}`}
-                      </li>
+              <label className="block text-sm font-medium text-gray-300 mb-1">AI Generated Routine</label>
+              <div className="bg-gray-700 p-4 rounded-lg max-h-96 overflow-y-auto">
+                {selectedRoutine.ai_generated && Object.keys(selectedRoutine.ai_generated).length > 0 ? (
+                  <div className="space-y-4">
+                    {Object.entries(selectedRoutine.ai_generated).map(([category, tasks]) => (
+                      <div key={category}>
+                        <h4 className="text-white font-medium mb-2">{category}</h4>
+                        {Array.isArray(tasks) && tasks.length > 0 ? (
+                          <ul className="space-y-2">
+                            {tasks.map((task, index) => (
+                              <li key={index} className="text-gray-300 text-sm">
+                                <div className="flex justify-between items-start">
+                                  <span>• {task.task}</span>
+                                  <span className="text-blue-400 text-xs ml-2">{task.time}</span>
+                                </div>
+                                {task.details && (
+                                  <p className="text-gray-400 text-xs mt-1 ml-4">{task.details}</p>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-gray-400 text-sm">No tasks in this category</p>
+                        )}
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 ) : (
-                  <p className="text-gray-400 text-sm">No tasks defined</p>
+                  <p className="text-gray-400 text-sm">No AI generated content available</p>
                 )}
               </div>
             </div>
-                    </div>
+          </div>
         )}
       </Modal>
 
@@ -399,27 +516,38 @@ const StreaksRoutines: React.FC = () => {
       >
         {selectedStreak && (
           <div className="space-y-4">
-                  <div>
+            <div>
               <h3 className="text-xl font-semibold text-white mb-2">User Streak</h3>
-                  </div>
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
-                  <div>
+              <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">User</label>
-                <p className="text-white">{(selectedStreak as { user?: { name?: string } }).user?.name || 'Unknown User'}</p>
-                  </div>
-                  <div>
+                <p className="text-white">{selectedStreak.user?.name || 'Unknown User'}</p>
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
-                <p className="text-white">{(selectedStreak as { user?: { email?: string } }).user?.email || 'No email'}</p>
-                  </div>
-                  <div>
+                <p className="text-white">{selectedStreak.user?.email || 'No email'}</p>
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Streak Count</label>
-                <p className="text-white text-2xl font-bold">{selectedStreak.count}</p>
-                  </div>
-                  <div>
+                <div className="flex items-center gap-2">
+                  <FiTarget className="w-5 h-5 text-green-500" />
+                  <p className="text-white text-2xl font-bold">{selectedStreak.count}</p>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">User ID</label>
+                <p className="text-white">{selectedStreak.user_id}</p>
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Created</label>
                 <p className="text-white">{formatDate(selectedStreak.createdAt)}</p>
-                  </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Last Updated</label>
+                <p className="text-white">{formatDate(selectedStreak.updatedAt)}</p>
+              </div>
             </div>
           </div>
         )}

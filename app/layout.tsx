@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Liftora - Login",
+  title: "Liftora",
   description: "Stay Connected. Stay Protected. Login to your Liftora account.",
 };
 
