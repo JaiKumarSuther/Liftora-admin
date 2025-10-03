@@ -9,7 +9,9 @@ import {
   FiX,
   FiDollarSign,
   FiMessageSquare,
-  FiActivity
+  FiActivity,
+  FiGift,
+  FiBookOpen
 } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -33,6 +35,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeNav, onNavChange }) => {
   const navigationItems: NavigationItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: MdSpaceDashboard, path: '/dashboard' },
     { id: 'user-management', label: 'User Management', icon: FiUsers, path: '/dashboard/user-management' },
+    { id: 'motivational-quotes', label: 'Motivational Quotes', icon: FiBookOpen, path: '/dashboard/motivational-quotes' },
+    { id: 'rewards-management', label: 'Rewards Management', icon: FiGift, path: '/dashboard/rewards-management' },
     { id: 'ai-interactions', label: 'AI Interactions', icon: FiMessageSquare, path: '/dashboard/ai-interactions' },
     { id: 'billing-analytics', label: 'Billing & Analytics', icon: FiDollarSign, path: '/dashboard/billing-analytics' },
     { id: 'streaks-routines', label: 'Streaks & Routines', icon: FiActivity, path: '/dashboard/streaks-routines' },

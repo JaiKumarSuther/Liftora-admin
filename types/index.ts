@@ -116,6 +116,127 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
+export interface PaginationResponse<T> {
+  success: boolean;
+  data: T[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
+
+// Admin API Types
+export interface AdminUser {
+  id: number;
+  name: string;
+  email: string;
+  subscriptionStatus: string;
+  createdAt: string;
+  isVerified: boolean;
+  alertsToggle: boolean;
+  profilePic?: string;
+}
+
+export interface AdminSubscription {
+  id: number;
+  userId: number;
+  status: string;
+  plan: string;
+  totalPaid: number;
+  userName: string;
+  userEmail: string;
+  createdAt: string;
+  updatedAt: string;
+  billingCycle?: string;
+  amount?: number;
+  nextBillingDate?: string;
+}
+
+export interface AdminStats {
+  users: {
+    total: number;
+    active: number;
+    newToday: number;
+    newThisMonth: number;
+  };
+  subscriptions: {
+    total: number;
+    active: number;
+    cancelled: number;
+    revenue: {
+      total: number;
+      monthlyTrend: Array<{ month: string; revenue: number }>;
+    };
+  };
+  rewards: {
+    total: number;
+    avgGemsPerUser: number;
+  };
+  content: {
+    totalQuotes: number;
+    totalAIQuotes: number;
+    notifications: number;
+  };
+  growth: {
+    dailySignups: Array<{ date: string; count: number }>;
+  };
+}
+
+export interface MotivationalQuote {
+  id: number;
+  quote: string;
+  author?: string;
+  month: number;
+  day: number;
+  sequential_day?: number;
+  theme?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RewardEvent {
+  id: number;
+  event_code: string;
+  event_name: string;
+  event_description?: string;
+  event_category: string;
+  points: number;
+  max_occurrences?: number;
+  cooldown_hours?: number;
+  is_active: boolean;
+  metadata?: any;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserRoutine {
+  id: number;
+  user_id: number;
+  name: string;
+  description?: string;
+  tasks: any[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserStreak {
+  id: number;
+  user_id: number;
+  count: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AIConversation {
+  id: number;
+  user_id: number;
+  prompt: string;
+  response: string;
+  createdAt: string;
+}
+
 export interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
   color?: string;

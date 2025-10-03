@@ -1,0 +1,1049 @@
+{
+    "collection": {
+      "info": {
+        "_postman_id": "184a4b17-edb7-4ec1-acd6-5b26144ab3f2",
+        "name": "liftora",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "updatedAt": "2025-10-02T16:03:56.000Z",
+        "createdAt": "2025-10-02T08:08:10.000Z",
+        "lastUpdatedBy": "29246832",
+        "uid": "29246832-184a4b17-edb7-4ec1-acd6-5b26144ab3f2"
+      },
+      "item": [
+        {
+          "name": "sign up",
+          "id": "05e86c13-e894-48c9-af36-5b88f178da3a",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n        \"name\":\"Rubab\",\r\n          \"email\":\"rubab@gmail.com\",\r\n          \"password\":\"test@123\"\r\n          \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8002/api/v2/user/signup",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8002",
+              "path": [
+                "api",
+                "v2",
+                "user",
+                "signup"
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-05e86c13-e894-48c9-af36-5b88f178da3a"
+        },
+        {
+          "name": "admin login",
+          "id": "a8179545-f126-41a6-87e5-ba1a63807097",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n        // \"name\":\"Rubab\",\r\n          \"email\":\"rubab@gmail.com\",\r\n          \"password\":\"Test@123\"\r\n          \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8002/api/v2/admin/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8002",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "login"
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-a8179545-f126-41a6-87e5-ba1a63807097"
+        },
+        {
+          "name": "stats",
+          "id": "5979251b-4fec-48f0-bf4a-2f4b7c6930bd",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8004/api/v2/admin/stats?startDate=2025-09-01&endDate=2025-09-30",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8004",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "stats"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-09-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-09-30"
+                },
+                {
+                  "key": "subscriptionStatus",
+                  "value": "active",
+                  "disabled": true
+                },
+                {
+                  "key": "planType",
+                  "value": "premium",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-5979251b-4fec-48f0-bf4a-2f4b7c6930bd"
+        },
+        {
+          "name": "analytics advanced",
+          "id": "71804bb0-a460-4a0b-a03c-00889396b672",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8002/api/v2/admin/analytics/advanced?startDate=2025-09-01&endDate=2025-09-30",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8002",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "analytics",
+                "advanced"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-09-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-09-30"
+                },
+                {
+                  "key": "subscriptionStatus",
+                  "value": "active",
+                  "disabled": true
+                },
+                {
+                  "key": "planType",
+                  "value": "premium",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-71804bb0-a460-4a0b-a03c-00889396b672"
+        },
+        {
+          "name": "user retentation report",
+          "id": "be389996-9262-48ed-939f-48f82d30645d",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8003/api/v2/admin/analytics/user-retention?startDate=2025-09-01&endDate=2025-09-30",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8003",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "analytics",
+                "user-retention"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-09-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-09-30"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-be389996-9262-48ed-939f-48f82d30645d"
+        },
+        {
+          "name": "users",
+          "id": "304f4f4f-60a3-4cb8-b036-c3d83161e771",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8001/api/v2/admin/users?fromDate=2025-09-01&toDate=2025-10-02&page=1&limit=10",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8001",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "rubab",
+                  "disabled": true
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2025-09-01"
+                },
+                {
+                  "key": "toDate",
+                  "value": "2025-10-02"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-304f4f4f-60a3-4cb8-b036-c3d83161e771"
+        },
+        {
+          "name": "user by id",
+          "id": "b6950c83-1e2d-43c9-bd7d-5eb083687ae9",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8001/api/v2/admin/users/71",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8001",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "users",
+                "71"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "rubab",
+                  "disabled": true
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2025-09-01",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "2025-10-02",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-b6950c83-1e2d-43c9-bd7d-5eb083687ae9"
+        },
+        {
+          "name": "update user by id",
+          "id": "c4de4090-66fe-43ea-8789-b280560407a1",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Jane Doe\",\r\n  \"email\": \"jane.doe@example.com\",\r\n  \"subscriptionStatus\": \"active\",\r\n  \"alertsToggle\": true,\r\n  \"isVerified\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8001/api/v2/admin/users/71",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8001",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "users",
+                "71"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "rubab",
+                  "disabled": true
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2025-09-01",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "2025-10-02",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-c4de4090-66fe-43ea-8789-b280560407a1"
+        },
+        {
+          "name": "get user ai converstaiton",
+          "id": "671c559e-679d-455a-ad37-6b11a326b5a4",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Jane Doe\",\r\n  \"email\": \"jane.doe@example.com\",\r\n  \"subscriptionStatus\": \"active\",\r\n  \"alertsToggle\": true,\r\n  \"isVerified\": true\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8003/api/v2/admin/users/73/ai-conversations",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8003",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "users",
+                "73",
+                "ai-conversations"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "rubab",
+                  "disabled": true
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2025-09-01",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "2025-10-02",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-671c559e-679d-455a-ad37-6b11a326b5a4"
+        },
+        {
+          "name": "all routine",
+          "id": "fdd9a48e-0b86-4f3c-9564-4f228d2b5bc0",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Jane Doe\",\r\n  \"email\": \"jane.doe@example.com\",\r\n  \"subscriptionStatus\": \"active\",\r\n  \"alertsToggle\": true,\r\n  \"isVerified\": true\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8003/api/v2/admin/routines",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8003",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "routines"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "rubab",
+                  "disabled": true
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2025-09-01",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "2025-10-02",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-fdd9a48e-0b86-4f3c-9564-4f228d2b5bc0"
+        },
+        {
+          "name": "user routine",
+          "id": "508834a0-79c0-4081-b96a-21feed58b327",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Jane Doe\",\r\n  \"email\": \"jane.doe@example.com\",\r\n  \"subscriptionStatus\": \"active\",\r\n  \"alertsToggle\": true,\r\n  \"isVerified\": true\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8003/api/v2/admin/users/58/routines",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8003",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "users",
+                "58",
+                "routines"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "rubab",
+                  "disabled": true
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2025-09-01",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "2025-10-02",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-508834a0-79c0-4081-b96a-21feed58b327"
+        },
+        {
+          "name": "all streaks",
+          "id": "67cd8cdb-61f1-445d-afba-2d399de4f819",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Jane Doe\",\r\n  \"email\": \"jane.doe@example.com\",\r\n  \"subscriptionStatus\": \"active\",\r\n  \"alertsToggle\": true,\r\n  \"isVerified\": true\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8003/api/v2/admin/users/62/streaks",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8003",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "users",
+                "62",
+                "streaks"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "rubab",
+                  "disabled": true
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2025-09-01",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "2025-10-02",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-67cd8cdb-61f1-445d-afba-2d399de4f819"
+        },
+        {
+          "name": "user streak",
+          "id": "17154e35-3281-4558-8b83-afe12e81f4e1",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": [],
+          "uid": "29246832-17154e35-3281-4558-8b83-afe12e81f4e1"
+        },
+        {
+          "name": "Create Motivational Quote",
+          "id": "3710192d-b6b7-4d5a-a64c-f642c7a67b7b",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quote\": \"Believe in yourself!\",\n  \"author\": \"Author Name\",\n  \"month\": 1,\n  \"day\": 4,\n  \"theme\": \"Motivation\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8003/api/v2/admin/quotes/motivational",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8003",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "quotes",
+                "motivational"
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-3710192d-b6b7-4d5a-a64c-f642c7a67b7b"
+        },
+        {
+          "name": "all motivational quotes",
+          "id": "e50908aa-39e3-4da7-bb63-01e82b34bb74",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Jane Doe\",\r\n  \"email\": \"jane.doe@example.com\",\r\n  \"subscriptionStatus\": \"active\",\r\n  \"alertsToggle\": true,\r\n  \"isVerified\": true\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8003/api/v2/admin/quotes/motivational",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8003",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "quotes",
+                "motivational"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-e50908aa-39e3-4da7-bb63-01e82b34bb74"
+        },
+        {
+          "name": "update motivational quote",
+          "id": "5d04660b-fda5-4b43-8e0f-1272a86cf445",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": " {\n          \n            \"quote\": \"An investment in knowledge pays the best interest.\"  \n        }"
+            },
+            "url": {
+              "raw": "http://localhost:8003/api/v2/admin/quotes/motivational/1186",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8003",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "quotes",
+                "motivational",
+                "1186"
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-5d04660b-fda5-4b43-8e0f-1272a86cf445"
+        },
+        {
+          "name": "get all reward events",
+          "id": "9afb89ec-9a36-484a-bd78-6769fe8fcae2",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8003/api/v2/admin/rewards/events",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8003",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "rewards",
+                "events"
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-9afb89ec-9a36-484a-bd78-6769fe8fcae2"
+        },
+        {
+          "name": "update reward events",
+          "id": "4feac963-c3ea-40e3-b151-63ed8a74a1c7",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "  {\r\n          \r\n            \"event_code\": \"TASK_STREAK_5\"\r\n            // \"event_name\": \"Task Master\",\r\n            // \"event_description\": \"Complete 5 tasks in a day\",\r\n            // \"event_category\": \"task\",\r\n            // \"points\": 30,\r\n            // \"max_occurrences\": 1,\r\n            // \"cooldown_hours\": 24,\r\n            // \"is_active\": true,\r\n            // \"metadata\": {\r\n            //     \"period\": \"daily\",\r\n            //     \"tasks_required\": 5\r\n            // }\r\n        }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8003/api/v2/admin/rewards/event/9",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8003",
+              "path": [
+                "api",
+                "v2",
+                "admin",
+                "rewards",
+                "event",
+                "9"
+              ]
+            }
+          },
+          "response": [],
+          "uid": "29246832-4feac963-c3ea-40e3-b151-63ed8a74a1c7"
+        },
+        {
+          "name": "New Request",
+          "id": "52024459-162e-4569-8e1c-94268ef5ea94",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": [],
+          "uid": "29246832-52024459-162e-4569-8e1c-94268ef5ea94"
+        }
+      ]
+    }
+  }
