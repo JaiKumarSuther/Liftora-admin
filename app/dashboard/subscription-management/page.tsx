@@ -63,7 +63,7 @@ const SubscriptionManagement: React.FC = () => {
       userEmail: user.email,
       planId: user.subscriptionStatus === 'active' ? 2 : 1,
       planName: user.subscriptionStatus === 'active' ? 'Premium' : 'Free',
-      status: user.subscriptionStatus,
+      status: user.subscriptionStatus || 'inactive',
       startDate: user.createdAt,
       nextBillingDate: user.subscriptionStatus === 'active' ? 
         new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : null,
@@ -108,7 +108,7 @@ const SubscriptionManagement: React.FC = () => {
     if (user) {
       setSelectedUser(user);
       setEditForm({
-        subscriptionStatus: user.subscriptionStatus,
+        subscriptionStatus: user.subscriptionStatus || 'inactive',
         accountType: user.subscriptionStatus === 'active' ? 'premium' : 'free'
       });
       setIsEditModalOpen(true);
@@ -401,8 +401,8 @@ const SubscriptionManagement: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(selectedUser.subscriptionStatus)}`}>
-                  {selectedUser.subscriptionStatus}
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(selectedUser.subscriptionStatus || 'inactive')}`}>
+                  {selectedUser.subscriptionStatus || 'inactive'}
                 </span>
               </div>
               <div>

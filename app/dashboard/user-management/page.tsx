@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { 
   FiEye, 
   FiEdit, 
@@ -234,10 +235,12 @@ const UserManagement: React.FC = () => {
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
                             {user.profilePic ? (
-                              <img
+                              <Image
                                 className="h-10 w-10 rounded-full object-cover"
                                 src={user.profilePic}
                                 alt={user.name}
+                                width={40}
+                                height={40}
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
                                   target.style.display = 'none';
@@ -355,10 +358,12 @@ const UserManagement: React.FC = () => {
             <div className="flex items-center space-x-4 mb-6">
               <div className="flex-shrink-0 h-16 w-16">
                 {selectedUser.profilePic ? (
-                  <img
+                  <Image
                     className="h-16 w-16 rounded-full object-cover"
                     src={selectedUser.profilePic}
                     alt={selectedUser.name}
+                    width={64}
+                    height={64}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
